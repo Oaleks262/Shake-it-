@@ -681,9 +681,44 @@ const CIRC = 2 * Math.PI * 33; // 238.76
 
 let gameActive = false;
 let timerInterval = null;
+let vibrateInterval = null;
 let countdownTimeout = null;
 let round = 0, cmdCount = 0, totalTime = 0;
 let historyItems = [];
+
+// Vibration patterns per command class
+const VIBRATE_PATTERNS = {
+  'shake-stop':   null,                        // no vibration — don't touch!
+  'shake-slow':   () => navigator.vibrate([120, 600]),   // slow pulse
+  'shake-medium': () => navigator.vibrate([80, 280]),    // medium pulse
+  'shake-fast':   () => navigator.vibrate([40, 100]),    // rapid buzz
+  'shake-left':   () => navigator.vibrate([100, 350]),   // left-hand rhythm
+  'shake-rotate': () => navigator.vibrate([60, 60, 60, 300]), // spin: 3 short
+};
+
+const VIBRATE_INTERVALS = {
+  'shake-stop':   null,
+  'shake-slow':   800,
+  'shake-medium': 400,
+  'shake-fast':   160,
+  'shake-left':   500,
+  'shake-rotate': 550,
+};
+
+function startVibration(cls) {
+  stopVibration();
+  if (!navigator.vibrate) return;
+  const pattern = VIBRATE_PATTERNS[cls];
+  const interval = VIBRATE_INTERVALS[cls];
+  if (!pattern || !interval) return;
+  pattern(); // fire immediately
+  vibrateInterval = setInterval(pattern, interval);
+}
+
+function stopVibration() {
+  if (vibrateInterval) { clearInterval(vibrateInterval); vibrateInterval = null; }
+  if (navigator.vibrate) navigator.vibrate(0);
+}
 
 // Shuffle queue — ensures no back-to-back repeat across refills
 let cmdQueue = [];
@@ -763,7 +798,7 @@ function showCommand(cmd, pos, duration) {
   void mainCard.offsetWidth;
   mainCard.classList.add('flash');
 
-  if (navigator.vibrate) navigator.vibrate([80,40,80]);
+  startVibration(cmd.cls);
 
   // Timer
   let secs = duration;
@@ -865,7 +900,8 @@ function stopGame() {
   statusDot.classList.remove('active');
   statusText.textContent = L.statusDone;
 
-  if (navigator.vibrate) navigator.vibrate([200,100,200]);
+  stopVibration();
+  setTimeout(() => { if (navigator.vibrate) navigator.vibrate([200,100,200]); }, 50);
 }
 
 btnStart.addEventListener('click', startGame);
