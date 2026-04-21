@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>SHAKE IT</title>
 <style>
+  html { background-color: #0a0a0f !important; min-height: 100%; }
   @font-face {
     font-family: 'Bebas Neue';
     font-style: normal;
@@ -38,8 +39,8 @@
 - { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-background: var(–bg);
-color: var(–text);
+background: #0a0a0f;
+color: #f0f0f0;
 font-family: ‘Space Mono’, monospace;
 min-height: 100vh;
 display: flex;
@@ -110,7 +111,7 @@ width: 100%;
 font-size: 9px;
 letter-spacing: 4px;
 text-transform: uppercase;
-color: var(–muted);
+color: #555;
 }
 
 .lang-bar {
@@ -126,7 +127,7 @@ padding: 5px 13px;
 border: none;
 border-radius: 7px;
 background: transparent;
-color: var(–muted);
+color: #555;
 font-family: ‘Space Mono’, monospace;
 font-size: 10px;
 letter-spacing: 2px;
@@ -136,7 +137,7 @@ text-transform: uppercase;
 }
 
 .lang-btn.active {
-background: var(–accent2);
+background: #00e5ff;
 color: #000;
 font-weight: 700;
 }
@@ -146,7 +147,7 @@ font-family: ‘Bebas Neue’, cursive;
 font-size: clamp(50px, 17vw, 76px);
 letter-spacing: 4px;
 line-height: 1;
-background: linear-gradient(135deg, var(–accent) 0%, var(–accent2) 100%);
+background: linear-gradient(135deg, #ff2d55 0%, #00e5ff 100%);
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 background-clip: text;
@@ -161,7 +162,7 @@ animation: logoPulse 3s ease-in-out infinite;
 
 .card {
 width: 100%;
-background: var(–panel);
+background: #111118;
 border: 1px solid rgba(255,255,255,0.07);
 border-radius: 20px;
 padding: 22px 20px;
@@ -179,7 +180,7 @@ content: ‘’;
 position: absolute;
 top: -1px; left: 20px; right: 20px;
 height: 1px;
-background: linear-gradient(90deg, transparent, var(–accent2), transparent);
+background: linear-gradient(90deg, transparent, #00e5ff, transparent);
 }
 
 .command-wrapper {
@@ -204,14 +205,14 @@ font-size: clamp(18px, 5.5vw, 28px);
 letter-spacing: 2px;
 text-align: center;
 line-height: 1.2;
-color: var(–text);
+color: #f0f0f0;
 text-transform: uppercase;
 transition: color 0.3s;
 white-space: nowrap;
 }
 
 .idle-hint {
-color: var(–muted);
+color: #555;
 font-size: 10px;
 letter-spacing: 2px;
 text-transform: uppercase;
@@ -236,7 +237,7 @@ transition: all 0.3s;
 }
 
 .c-dot.done    { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.35); }
-.c-dot.current { background: var(–c, var(–accent2)); box-shadow: 0 0 8px var(–c, var(–accent2)); width: 9px; height: 9px; border-color: transparent; }
+.c-dot.current { background: #00e5ff; box-shadow: 0 0 8px #00e5ff; width: 9px; height: 9px; border-color: transparent; }
 
 /* Timer ring */
 .timer-ring {
@@ -259,7 +260,7 @@ stroke-width: 4;
 
 .progress-circle {
 fill: none;
-stroke: var(–accent2);
+stroke: #00e5ff;
 stroke-width: 4;
 stroke-linecap: round;
 stroke-dasharray: 239;
@@ -275,7 +276,7 @@ align-items: center;
 justify-content: center;
 font-family: ‘Bebas Neue’, cursive;
 font-size: 28px;
-color: var(–accent2);
+color: #00e5ff;
 }
 
 /* Buttons */
@@ -284,7 +285,7 @@ width: 100%;
 padding: 16px;
 border: none;
 border-radius: 14px;
-background: linear-gradient(135deg, var(–accent), #ff6b35);
+background: linear-gradient(135deg, #ff2d55, #ff6b35);
 color: white;
 font-family: ‘Bebas Neue’, cursive;
 font-size: 24px;
@@ -310,10 +311,10 @@ background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 100%
 .btn-stop {
 width: 100%;
 padding: 15px;
-border: 2px solid var(–accent);
+border: 2px solid #ff2d55;
 border-radius: 14px;
 background: rgba(255,45,85,0.07);
-color: var(–accent);
+color: #ff2d55;
 font-family: ‘Bebas Neue’, cursive;
 font-size: 22px;
 letter-spacing: 4px;
@@ -333,7 +334,7 @@ animation: stopGlow 2s ease-in-out infinite;
 .kb-hint {
 font-size: 9px;
 letter-spacing: 2px;
-color: var(–muted);
+color: #555;
 text-transform: uppercase;
 text-align: center;
 display: none;
@@ -359,14 +360,14 @@ border: 1px solid rgba(255,255,255,0.06);
 .stat-label {
 font-size: 8px;
 letter-spacing: 3px;
-color: var(–muted);
+color: #555;
 text-transform: uppercase;
 }
 
 .stat-value {
 font-family: ‘Bebas Neue’, cursive;
 font-size: 26px;
-color: var(–accent3);
+color: #ffcc00;
 line-height: 1.1;
 }
 
@@ -385,7 +386,7 @@ display: flex;
 align-items: center;
 gap: 8px;
 font-size: 10px;
-color: var(–muted);
+color: #555;
 letter-spacing: 1px;
 padding: 4px 8px;
 border-radius: 6px;
@@ -417,7 +418,7 @@ to   { opacity:1; transform:translateY(0); }
 @keyframes rot    { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
 
 .flash { animation: flashBg 0.4s ease !important; }
-@keyframes flashBg { 0%{background:rgba(255,45,85,0.2)} 100%{background:var(–panel)} }
+@keyframes flashBg { 0%{background:rgba(255,45,85,0.2)} 100%{background:#111118} }
 
 /* Countdown overlay */
 .countdown-overlay {
@@ -441,7 +442,7 @@ gap: 12px;
 .countdown-number {
 font-family: ‘Bebas Neue’, cursive;
 font-size: 160px;
-background: linear-gradient(135deg, var(–accent), var(–accent2));
+background: linear-gradient(135deg, #ff2d55, #00e5ff);
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 background-clip: text;
@@ -452,7 +453,7 @@ line-height: 1;
 .countdown-sub {
 font-size: 11px;
 letter-spacing: 5px;
-color: var(–muted);
+color: #555;
 text-transform: uppercase;
 }
 
@@ -468,27 +469,27 @@ align-items: center;
 gap: 8px;
 font-size: 10px;
 letter-spacing: 2px;
-color: var(–muted);
+color: #555;
 text-transform: uppercase;
 }
 
 .status-dot {
 width: 8px; height: 8px;
 border-radius: 50%;
-background: var(–muted);
+background: #555;
 flex-shrink: 0;
 transition: background 0.3s;
 }
 
 .status-dot.active {
-background: var(–accent);
-box-shadow: 0 0 8px var(–accent);
+background: #ff2d55;
+box-shadow: 0 0 8px #ff2d55;
 animation: dotPulse 1s ease infinite;
 }
 
 @keyframes dotPulse {
-0%,100% { box-shadow:0 0 8px var(–accent); }
-50%     { box-shadow:0 0 20px var(–accent); }
+0%,100% { box-shadow:0 0 8px #ff2d55; }
+50%     { box-shadow:0 0 20px #ff2d55; }
 }
 
 .divider { width:100%; height:1px; background:rgba(255,255,255,0.06); }
@@ -501,10 +502,10 @@ animation: dotPulse 1s ease infinite;
 .theme-purple { –c:#bf5fff; }
 .theme-orange { –c:#ff6b35; }
 
-.command-text    { color: var(–c, var(–text)); }
-.timer-number    { color: var(–c, var(–accent2)); }
-.progress-circle { stroke: var(–c, var(–accent2)) !important; }
-.status-dot.active { background: var(–c, var(–accent)); box-shadow: 0 0 8px var(–c, var(–accent)); }
+.command-text    { color: var(–c, #f0f0f0); }
+.timer-number    { color: #00e5ff; }
+.progress-circle { stroke: #00e5ff !important; }
+.status-dot.active { background: var(–c, #ff2d55); box-shadow: 0 0 8px var(–c, #ff2d55); }
 </style>
 
 </head>
