@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SHAKE IT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+–bg: #0a0a0f;
+–panel: #111118;
+–accent: #ff2d55;
+–accent2: #00e5ff;
+–accent3: #ffcc00;
+–text: #f0f0f0;
+–muted: #555;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Space Mono’, monospace;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+position: relative;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+background-size: 40px 40px;
+animation: gridShift 20s linear infinite;
+pointer-events: none;
+z-index: 0;
+}
+
+@keyframes gridShift {
+0% { transform: translate(0,0); }
+100% { transform: translate(40px,40px); }
+}
+
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.04’/%3E%3C/svg%3E”);
+opacity: 0.3;
+pointer-events: none;
+z-index: 0;
+}
+
+.container {
+position: relative;
+z-index: 1;
+width: min(420px, 94vw);
+padding: 16px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 14px;
+}
+
+.btn-area {
+width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 10px;
+min-height: 110px;
+justify-content: flex-start;
+}
+
+.top-bar {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+}
+
+.tagline {
+font-size: 9px;
+letter-spacing: 4px;
+text-transform: uppercase;
+color: var(–muted);
+}
+
+.lang-bar {
+display: flex;
+background: rgba(255,255,255,0.06);
+border-radius: 10px;
+padding: 3px;
+gap: 2px;
+}
+
+.lang-btn {
+padding: 5px 13px;
+border: none;
+border-radius: 7px;
+background: transparent;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+font-size: 10px;
+letter-spacing: 2px;
+cursor: pointer;
+transition: all 0.2s;
+text-transform: uppercase;
+}
+
+.lang-btn.active {
+background: var(–accent2);
+color: #000;
+font-weight: 700;
+}
+
+.logo {
+font-family: ‘Bebas Neue’, cursive;
+font-size: clamp(50px, 17vw, 76px);
+letter-spacing: 4px;
+line-height: 1;
+background: linear-gradient(135deg, var(–accent) 0%, var(–accent2) 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+filter: drop-shadow(0 0 20px rgba(255,45,85,0.4));
+animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+0%,100% { filter: drop-shadow(0 0 20px rgba(255,45,85,0.4)); }
+50%      { filter: drop-shadow(0 0 40px rgba(0,229,255,0.6)); }
+}
+
+.card {
+width: 100%;
+background: var(–panel);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 20px;
+padding: 22px 20px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 14px;
+position: relative;
+overflow: hidden;
+flex-shrink: 0;
+}
+
+.card::before {
+content: ‘’;
+position: absolute;
+top: -1px; left: 20px; right: 20px;
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–accent2), transparent);
+}
+
+.command-wrapper {
+width: 100%;
+height: 140px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 8px;
+flex-shrink: 0;
+}
+
+.command-emoji {
+font-size: 52px;
+line-height: 1;
+}
+
+.command-text {
+font-family: ‘Bebas Neue’, cursive;
+font-size: clamp(18px, 5.5vw, 28px);
+letter-spacing: 2px;
+text-align: center;
+line-height: 1.2;
+color: var(–text);
+text-transform: uppercase;
+transition: color 0.3s;
+white-space: nowrap;
+}
+
+.idle-hint {
+color: var(–muted);
+font-size: 10px;
+letter-spacing: 2px;
+text-transform: uppercase;
+text-align: center;
+line-height: 1.9;
+}
+
+/* Progress dots — show position in the 6-command cycle */
+.cycle-dots {
+display: flex;
+gap: 6px;
+align-items: center;
+margin-top: 2px;
+}
+
+.c-dot {
+width: 7px; height: 7px;
+border-radius: 50%;
+background: rgba(255,255,255,0.1);
+border: 1px solid rgba(255,255,255,0.18);
+transition: all 0.3s;
+}
+
+.c-dot.done    { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.35); }
+.c-dot.current { background: var(–c, var(–accent2)); box-shadow: 0 0 8px var(–c, var(–accent2)); width: 9px; height: 9px; border-color: transparent; }
+
+/* Timer ring */
+.timer-ring {
+position: relative;
+width: 86px; height: 86px;
+flex-shrink: 0;
+display: none;
+}
+
+.timer-ring svg {
+transform: rotate(-90deg);
+width: 86px; height: 86px;
+}
+
+.bg-circle {
+fill: none;
+stroke: rgba(255,255,255,0.06);
+stroke-width: 4;
+}
+
+.progress-circle {
+fill: none;
+stroke: var(–accent2);
+stroke-width: 4;
+stroke-linecap: round;
+stroke-dasharray: 239;
+stroke-dashoffset: 0;
+transition: stroke-dashoffset 1s linear, stroke 0.5s;
+}
+
+.timer-number {
+position: absolute;
+inset: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: ‘Bebas Neue’, cursive;
+font-size: 28px;
+color: var(–accent2);
+}
+
+/* Buttons */
+.btn-start {
+width: 100%;
+padding: 16px;
+border: none;
+border-radius: 14px;
+background: linear-gradient(135deg, var(–accent), #ff6b35);
+color: white;
+font-family: ‘Bebas Neue’, cursive;
+font-size: 24px;
+letter-spacing: 4px;
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+overflow: hidden;
+box-shadow: 0 4px 24px rgba(255,45,85,0.35);
+}
+
+.btn-start::after {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 100%);
+}
+
+.btn-start:active { transform: scale(0.97); }
+.btn-start:hover  { box-shadow: 0 6px 32px rgba(255,45,85,0.55); }
+
+/* STOP — bold, always visible when game runs */
+.btn-stop {
+width: 100%;
+padding: 15px;
+border: 2px solid var(–accent);
+border-radius: 14px;
+background: rgba(255,45,85,0.07);
+color: var(–accent);
+font-family: ‘Bebas Neue’, cursive;
+font-size: 22px;
+letter-spacing: 4px;
+cursor: pointer;
+transition: all 0.2s;
+display: none;
+animation: stopGlow 2s ease-in-out infinite;
+}
+
+@keyframes stopGlow {
+0%,100% { box-shadow: 0 0 0 0 rgba(255,45,85,0.25); }
+50%      { box-shadow: 0 0 0 7px rgba(255,45,85,0); }
+}
+
+.btn-stop:active  { background: rgba(255,45,85,0.18); transform: scale(0.97); }
+
+.kb-hint {
+font-size: 9px;
+letter-spacing: 2px;
+color: var(–muted);
+text-transform: uppercase;
+text-align: center;
+display: none;
+}
+.kb-hint.visible { display: block; }
+
+/* Stats */
+.stats-row {
+display: flex;
+gap: 10px;
+width: 100%;
+}
+
+.stat-box {
+flex: 1;
+background: rgba(255,255,255,0.04);
+border-radius: 12px;
+padding: 8px;
+text-align: center;
+border: 1px solid rgba(255,255,255,0.06);
+}
+
+.stat-label {
+font-size: 8px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+}
+
+.stat-value {
+font-family: ‘Bebas Neue’, cursive;
+font-size: 26px;
+color: var(–accent3);
+line-height: 1.1;
+}
+
+/* History */
+.history {
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 5px;
+max-height: 100px;
+overflow: hidden;
+}
+
+.history-item {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 10px;
+color: var(–muted);
+letter-spacing: 1px;
+padding: 4px 8px;
+border-radius: 6px;
+background: rgba(255,255,255,0.02);
+animation: fadeSlide 0.3s ease forwards;
+opacity: 0;
+}
+
+@keyframes fadeSlide {
+from { opacity:0; transform:translateY(-5px); }
+to   { opacity:1; transform:translateY(0); }
+}
+
+.h-dur { color: rgba(255,255,255,0.22); margin-left: auto; }
+
+/* Command animations */
+.shake-stop   .command-emoji { animation: puls   2s ease-in-out infinite; }
+.shake-slow   .command-emoji { animation: shSlow 0.7s ease-in-out infinite; }
+.shake-medium .command-emoji { animation: shMed  0.3s ease-in-out infinite; }
+.shake-fast   .command-emoji { animation: shFast 0.12s linear infinite; }
+.shake-left   .command-emoji { animation: shLeft 0.4s ease-in-out infinite; }
+.shake-rotate .command-emoji { animation: rot    1s linear infinite; }
+
+@keyframes puls   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+@keyframes shSlow { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px) rotate(-3deg)} 75%{transform:translateX(10px) rotate(3deg)} }
+@keyframes shMed  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-18px) rotate(-5deg)} 75%{transform:translateX(18px) rotate(5deg)} }
+@keyframes shFast { 0%,100%{transform:translateX(0) rotate(0)} 25%{transform:translateX(-22px) rotate(-8deg)} 75%{transform:translateX(22px) rotate(8deg)} }
+@keyframes shLeft { 0%,100%{transform:translateX(0) rotate(0)} 33%{transform:translateX(-24px) rotate(-12deg)} 66%{transform:translateX(-8px) rotate(-4deg)} }
+@keyframes rot    { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+.flash { animation: flashBg 0.4s ease !important; }
+@keyframes flashBg { 0%{background:rgba(255,45,85,0.2)} 100%{background:var(–panel)} }
+
+/* Countdown overlay */
+.countdown-overlay {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.88);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 100;
+backdrop-filter: blur(6px);
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.3s;
+gap: 12px;
+}
+
+.countdown-overlay.active { opacity:1; pointer-events:all; }
+
+.countdown-number {
+font-family: ‘Bebas Neue’, cursive;
+font-size: 160px;
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+filter: drop-shadow(0 0 40px rgba(255,45,85,0.5));
+line-height: 1;
+}
+
+.countdown-sub {
+font-size: 11px;
+letter-spacing: 5px;
+color: var(–muted);
+text-transform: uppercase;
+}
+
+@keyframes countPop {
+0%   { transform:scale(2); opacity:0; }
+50%  { transform:scale(0.92); opacity:1; }
+100% { transform:scale(1); opacity:1; }
+}
+
+.status-row {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 10px;
+letter-spacing: 2px;
+color: var(–muted);
+text-transform: uppercase;
+}
+
+.status-dot {
+width: 8px; height: 8px;
+border-radius: 50%;
+background: var(–muted);
+flex-shrink: 0;
+transition: background 0.3s;
+}
+
+.status-dot.active {
+background: var(–accent);
+box-shadow: 0 0 8px var(–accent);
+animation: dotPulse 1s ease infinite;
+}
+
+@keyframes dotPulse {
+0%,100% { box-shadow:0 0 8px var(–accent); }
+50%     { box-shadow:0 0 20px var(–accent); }
+}
+
+.divider { width:100%; height:1px; background:rgba(255,255,255,0.06); }
+
+/* Per-command color theming */
+.theme-red    { –c:#ff2d55; }
+.theme-blue   { –c:#00e5ff; }
+.theme-yellow { –c:#ffcc00; }
+.theme-green  { –c:#39ff14; }
+.theme-purple { –c:#bf5fff; }
+.theme-orange { –c:#ff6b35; }
+
+.command-text    { color: var(–c, var(–text)); }
+.timer-number    { color: var(–c, var(–accent2)); }
+.progress-circle { stroke: var(–c, var(–accent2)) !important; }
+.status-dot.active { background: var(–c, var(–accent)); box-shadow: 0 0 8px var(–c, var(–accent)); }
+</style>
+
+</head>
+<body>
+
+<div class="countdown-overlay" id="countdownOverlay">
+  <div class="countdown-number" id="countdownNum">3</div>
+  <div class="countdown-sub" id="countdownSub">Приготуйся!</div>
+</div>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="tagline" id="tagline">Вечірка · Пиятика · Безумство</div>
+    <div class="lang-bar">
+      <button class="lang-btn active" id="btnUA" onclick="setLang('uk')">УКР</button>
+      <button class="lang-btn"        id="btnEN" onclick="setLang('en')">ENG</button>
+    </div>
+  </div>
+
+  <div class="logo">SHAKE IT</div>
+
+  <div class="card" id="mainCard">
+
+```
+<div class="status-row">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Готовий до гри</span>
+</div>
+
+<div class="divider"></div>
+
+<div class="command-wrapper" id="commandWrapper">
+  <div class="command-emoji" id="commandEmoji">📱</div>
+  <div class="command-text"  id="commandText">Натисни СТАРТ</div>
+  <div class="idle-hint"     id="idleHint">Дії не повторюються підряд<br>Час: 5 · 10 · 15 сек</div>
+  <div class="cycle-dots"    id="cycleDots" style="display:none"></div>
+</div>
+
+<div class="timer-ring" id="timerRing">
+  <svg viewBox="0 0 86 86">
+    <circle class="bg-circle"       cx="43" cy="43" r="38"/>
+    <circle class="progress-circle" id="progressCircle" cx="43" cy="43" r="38"/>
+  </svg>
+  <div class="timer-number" id="timerNumber">0</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="stats-row">
+  <div class="stat-box">
+    <div class="stat-label" id="lblRound">Раунд</div>
+    <div class="stat-value" id="roundNum">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label" id="lblCmds">Команд</div>
+    <div class="stat-value" id="cmdCount">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label" id="lblTime">Час (с)</div>
+    <div class="stat-value" id="totalTime">0</div>
+  </div>
+</div>
+
+<div class="history" id="history"></div>
+```
+
+  </div>
+
+  <div class="btn-area">
+    <button class="btn-start" id="btnStart">▶ СТАРТ</button>
+    <button class="btn-stop"  id="btnStop">⏹ СТОП</button>
+    <div class="kb-hint"      id="kbHint">ESC / ПРОБІЛ — зупинити гру</div>
+  </div>
+
+</div>
+
+<script>
+// ── TRANSLATIONS ─────────────────────────────────────────────────
+const LANGS = {
+  uk: {
+    tagline:      'Вечірка · Пиятика · Безумство',
+    ready:        'Готовий до гри',
+    idleHint:     'Дії не повторюються підряд\nЧас: 5 · 10 · 15 сек',
+    countSub:     'Приготуйся!',
+    btnStart:     '▶ СТАРТ',
+    btnStop:      '⏹ СТОП',
+    kbHint:       'ESC / ПРОБІЛ — зупинити гру',
+    lblRound:     'Раунд',
+    lblCmds:      'Команд',
+    lblTime:      'Час (с)',
+    statusPrepare:'Приготуйся...',
+    statusRound:  (r,d) => `Раунд ${r} — ${d}с`,
+    statusDone:   'Гра завершена',
+    stopTitle:    'ГРУ ЗУПИНЕНО',
+    stopHint:     (r,c,t) => `Раундів: ${r} · Команд: ${c} · Час: ${t}с`,
+    sec:          'с',
+    cmds: [
+      { text:'НЕ ТОРКАТИСЬ!',   emoji:'🚫', cls:'shake-stop',   theme:'theme-red'    },
+      { text:'ПОВІЛЬНО', emoji:'〰️', cls:'shake-slow',   theme:'theme-blue'   },
+      { text:'СЕРЕДНЬО', emoji:'〽️', cls:'shake-medium', theme:'theme-yellow' },
+      { text:'ШВИДКО',   emoji:'💥', cls:'shake-fast',   theme:'theme-orange' },
+      { text:'ЛІВОЮ РУКОЮ',     emoji:'🫲', cls:'shake-left',   theme:'theme-green'  },
+      { text: 'ЛЯСНУТИ',       emoji:'🔄', cls:'shake-rotate', theme:'theme-purple' },
+    ]
+  },
+  en: {
+    tagline:      'Party · Drinks · Chaos',
+    ready:        'Ready to play',
+    idleHint:     'No back-to-back repeats\nTime: 5 · 10 · 15 sec',
+    countSub:     'Get ready!',
+    btnStart:     '▶ START',
+    btnStop:      '⏹ STOP',
+    kbHint:       'ESC / SPACE — stop the game',
+    lblRound:     'Round',
+    lblCmds:      'Moves',
+    lblTime:      'Sec',
+    statusPrepare:'Get ready...',
+    statusRound:  (r,d) => `Round ${r} — ${d}s`,
+    statusDone:   'Game over',
+    stopTitle:    'GAME STOPPED',
+    stopHint:     (r,c,t) => `Rounds: ${r} · Moves: ${c} · Time: ${t}s`,
+    sec:          's',
+    cmds: [
+      { text:"DON'T TOUCH!",   emoji:'🚫', cls:'shake-stop',   theme:'theme-red'    },
+      { text:'SLOWLY',   emoji:'〰️', cls:'shake-slow',   theme:'theme-blue'   },
+      { text:'MEDIUM',   emoji:'〽️', cls:'shake-medium', theme:'theme-yellow' },
+      { text:'FAST',     emoji:'💥', cls:'shake-fast',   theme:'theme-orange' },
+      { text:'LEFT HAND ONLY', emoji:'🫲', cls:'shake-left',   theme:'theme-green'  },
+      { text:'FLIP',        emoji:'🔄', cls:'shake-rotate', theme:'theme-purple' },
+    ]
+  }
+};
+
+let lang = 'uk';
+let L = LANGS.uk;
+
+function setLang(l) {
+  lang = l; L = LANGS[l];
+  document.getElementById('tagline').textContent    = L.tagline;
+  document.getElementById('countdownSub').textContent = L.countSub;
+  document.getElementById('btnStart').textContent   = L.btnStart;
+  document.getElementById('btnStop').textContent    = L.btnStop;
+  document.getElementById('kbHint').textContent     = L.kbHint;
+  document.getElementById('lblRound').textContent   = L.lblRound;
+  document.getElementById('lblCmds').textContent    = L.lblCmds;
+  document.getElementById('lblTime').textContent    = L.lblTime;
+  document.getElementById('btnUA').classList.toggle('active', l === 'uk');
+  document.getElementById('btnEN').classList.toggle('active', l === 'en');
+  if (!gameActive) {
+    document.getElementById('statusText').textContent = L.ready;
+    document.getElementById('idleHint').innerHTML = L.idleHint.replace('\n','<br>');
+    document.getElementById('commandText').textContent = l === 'uk' ? 'Натисни СТАРТ' : 'Press START';
+  }
+}
+
+// ── SHUFFLE (no repeat between cycles) ───────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+const DURATIONS = [5, 10, 15];
+const CIRC = 2 * Math.PI * 38; // 238.76
+
+let gameActive = false;
+let timerInterval = null;
+let countdownTimeout = null;
+let round = 0, cmdCount = 0, totalTime = 0;
+let historyItems = [];
+
+// Shuffle queue — ensures no back-to-back repeat across refills
+let cmdQueue = [];
+let lastIdx = -1;
+
+function refillQueue() {
+  let indices = shuffle([0,1,2,3,4,5]);
+  // If new queue starts with same command as last shown → swap it to end
+  if (lastIdx !== -1 && indices[0] === lastIdx) {
+    indices.push(indices.shift());
+  }
+  cmdQueue = indices;
+}
+
+function dequeueCmd() {
+  if (cmdQueue.length === 0) refillQueue();
+  const idx = cmdQueue.shift();
+  lastIdx = idx;
+  return { cmd: L.cmds[idx], posInCycle: 6 - cmdQueue.length }; // 1..6
+}
+
+// ── DOM refs ─────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const mainCard       = $('mainCard');
+const commandWrapper = $('commandWrapper');
+const commandEmoji   = $('commandEmoji');
+const commandText    = $('commandText');
+const idleHint       = $('idleHint');
+const cycleDots      = $('cycleDots');
+const timerRing      = $('timerRing');
+const progressCircle = $('progressCircle');
+const timerNumber    = $('timerNumber');
+const statusDot      = $('statusDot');
+const statusText     = $('statusText');
+const btnStart       = $('btnStart');
+const btnStop        = $('btnStop');
+const kbHint         = $('kbHint');
+const roundNumEl     = $('roundNum');
+const cmdCountEl     = $('cmdCount');
+const totalTimeEl    = $('totalTime');
+const historyEl      = $('history');
+const countdownOverlay = $('countdownOverlay');
+const countdownNum   = $('countdownNum');
+
+// ── Cycle dots ───────────────────────────────────────────────────
+function renderDots(pos) {
+  cycleDots.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const d = document.createElement('div');
+    d.className = 'c-dot' + (i < pos-1 ? ' done' : i === pos-1 ? ' current' : '');
+    cycleDots.appendChild(d);
+  }
+}
+
+// ── Theme ────────────────────────────────────────────────────────
+const THEMES = ['theme-red','theme-blue','theme-yellow','theme-green','theme-purple','theme-orange'];
+const ANIMS  = ['shake-stop','shake-slow','shake-medium','shake-fast','shake-left','shake-rotate'];
+
+function applyTheme(cmd) {
+  mainCard.classList.remove(...THEMES);
+  commandWrapper.classList.remove(...ANIMS);
+  if (cmd) { mainCard.classList.add(cmd.theme); commandWrapper.classList.add(cmd.cls); }
+}
+
+// ── Show command ─────────────────────────────────────────────────
+function showCommand(cmd, pos, duration) {
+  commandEmoji.textContent = cmd.emoji;
+  commandText.textContent  = cmd.text;
+  idleHint.style.display   = 'none';
+  timerRing.style.display  = 'flex';
+  cycleDots.style.display  = 'flex';
+  renderDots(pos);
+  applyTheme(cmd);
+
+  // Flash
+  mainCard.classList.remove('flash');
+  void mainCard.offsetWidth;
+  mainCard.classList.add('flash');
+
+  if (navigator.vibrate) navigator.vibrate([80,40,80]);
+
+  // Timer
+  let secs = duration;
+  timerNumber.textContent = secs;
+  progressCircle.style.strokeDasharray  = CIRC;
+  progressCircle.style.strokeDashoffset = 0;
+
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    secs--;
+    timerNumber.textContent = secs;
+    progressCircle.style.strokeDashoffset = CIRC * (1 - secs / duration);
+    totalTime++;
+    totalTimeEl.textContent = totalTime;
+    if (secs <= 0) {
+      clearInterval(timerInterval);
+      if (gameActive) nextTurn();
+    }
+  }, 1000);
+
+  cmdCount++;
+  cmdCountEl.textContent = cmdCount;
+  addHistory(cmd, duration);
+}
+
+function addHistory(cmd, dur) {
+  historyItems.unshift({ emoji: cmd.emoji, text: cmd.text, dur });
+  if (historyItems.length > 3) historyItems.pop();
+  historyEl.innerHTML = historyItems.map((h,i) =>
+    `<div class="history-item" style="opacity:${1-i*0.3}">
+      <span>${h.emoji}</span><span>${h.text}</span>
+      <span class="h-dur">${h.dur}${L.sec}</span>
+    </div>`).join('');
+}
+
+function nextTurn() {
+  const { cmd, posInCycle } = dequeueCmd();
+  const dur = DURATIONS[Math.floor(Math.random()*3)];
+  round++;
+  roundNumEl.textContent = round;
+  statusText.textContent = L.statusRound(round, dur);
+  showCommand(cmd, posInCycle, dur);
+}
+
+// ── Countdown ────────────────────────────────────────────────────
+function startCountdown(cb) {
+  let n = 3;
+  countdownOverlay.classList.add('active');
+
+  const tick = () => {
+    countdownNum.style.animation = 'none';
+    void countdownNum.offsetWidth;
+    countdownNum.style.animation = 'countPop 0.85s cubic-bezier(0.175,0.885,0.32,1.275) forwards';
+    countdownNum.textContent = n;
+    if (navigator.vibrate) navigator.vibrate(50);
+    n--;
+    if (n > 0) { countdownTimeout = setTimeout(tick, 900); }
+    else { countdownTimeout = setTimeout(() => { countdownOverlay.classList.remove('active'); cb(); }, 900); }
+  };
+  tick();
+}
+
+// ── Start ────────────────────────────────────────────────────────
+function startGame() {
+  gameActive = true;
+  round = 0; cmdCount = 0; totalTime = 0;
+  historyItems = []; cmdQueue = []; lastIdx = -1;
+  roundNumEl.textContent = cmdCountEl.textContent = totalTimeEl.textContent = 0;
+  historyEl.innerHTML = '';
+  cycleDots.style.display = 'none';
+
+  btnStart.style.display = 'none';
+  btnStop.style.display  = 'block';
+  kbHint.classList.add('visible');
+  statusDot.classList.add('active');
+  statusText.textContent = L.statusPrepare;
+
+  startCountdown(() => { if (gameActive) nextTurn(); });
+}
+
+// ── Stop ─────────────────────────────────────────────────────────
+function stopGame() {
+  gameActive = false;
+  clearInterval(timerInterval);
+  clearTimeout(countdownTimeout);
+  countdownOverlay.classList.remove('active');
+
+  applyTheme(null);
+  commandEmoji.textContent = '🏁';
+  commandText.textContent  = L.stopTitle;
+  idleHint.style.display   = 'block';
+  idleHint.innerHTML       = L.stopHint(round, cmdCount, totalTime);
+  timerRing.style.display  = 'none';
+  cycleDots.style.display  = 'none';
+
+  btnStart.style.display = 'block';
+  btnStop.style.display  = 'none';
+  kbHint.classList.remove('visible');
+  statusDot.classList.remove('active');
+  statusText.textContent = L.statusDone;
+
+  if (navigator.vibrate) navigator.vibrate([200,100,200]);
+}
+
+btnStart.addEventListener('click', startGame);
+btnStop.addEventListener('click',  stopGame);
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.key === 'Escape') {
+    e.preventDefault();
+    gameActive ? stopGame() : startGame();
+  }
+});
+</script>
+
+</body>
+</html>
